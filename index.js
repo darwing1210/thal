@@ -27,7 +27,8 @@ async function run() {
   await page.keyboard.type(CREDS.password);
 
   await page.click(BUTTON_SELECTOR);
-  await page.waitForNavigation();
+  await page.waitFor(2 * 1000);
+  // await page.waitForNavigation();
 
   const userToSearch = 'john';
   const searchUrl = `https://github.com/search?q=${userToSearch}&type=Users&utf8=%E2%9C%93`;
@@ -47,6 +48,7 @@ async function run() {
 
   for (let h = 1; h <= numPages; h++) {
     let pageUrl = searchUrl + '&p=' + h;
+    await page.waitFor(2 * 1000); // Adding an small delay for demo
     await page.goto(pageUrl);
 
     let listLength = await page.evaluate((sel) => {
@@ -73,11 +75,11 @@ async function run() {
 
       console.log(username, ' -> ', email);
 
-      upsertUser({
-        username: username,
-        email: email,
-        dateCrawled: new Date()
-      });
+      // upsertUser({
+      //   username: username,
+      //   email: email,
+      //   dateCrawled: new Date()
+      // });
     }
   }
 
@@ -85,7 +87,7 @@ async function run() {
 }
 
 async function getNumPages(page) {
-  const NUM_USER_SELECTOR = '#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > div.d-flex.flex-justify-between.border-bottom.pb-3 > h3';
+  const NUM_USER_SELECTOR = '#js-pjax-container > div > div.col-12.col-md-9.float-left.px-2.pt-3.pt-md-0.codesearch-results > div > div.d-flex.flex-column.flex-md-row.flex-justify-between.border-bottom.pb-3.position-relative > h3';
 
   let inner = await page.evaluate((sel) => {
     let html = document.querySelector(sel).innerHTML;
